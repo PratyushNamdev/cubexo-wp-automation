@@ -2,19 +2,17 @@ from flask import Flask, request
 import requests
 from twilio.twiml.messaging_response import MessagingResponse
 
-
 app = Flask(__name__)
-
 
 @app.route('/bot', methods=['POST'])
 def bot():
-    incoming_msg = request.data.get('Body', '').lower()
+    incoming_msg = request.form['Body'].lower()  # Retrieve message body from Twilio request
     resp = MessagingResponse()
     msg = resp.message()
     responded = False
 
     if 'quote' in incoming_msg:
-        # return a quote
+        # Return a quote
         r = requests.get('https://api.quotable.io/random')
         if r.status_code == 200:
             data = r.json()
@@ -25,15 +23,15 @@ def bot():
         responded = True
 
     elif 'cat' in incoming_msg:
-        # return a cat pic
+        # Return a cat pic
         msg.media('https://cataas.com/cat')
         responded = True
 
     elif 'language' in incoming_msg:
-        # send interactive message for language preference
+        # Send interactive message for language preference
         msg.body("Please choose your language preference:")
-        msg.add_button('Hindi', 'HINDI')
-        msg.add_button('English', 'ENGLISH')
+        msg.add_button('Hindi', 'hindi')
+        msg.add_button('English', 'english')
         responded = True
 
     elif 'hindi' in incoming_msg:
@@ -46,7 +44,8 @@ def bot():
 
     if not responded:
         msg.body('I only know about famous quotes, cats, and language preferences, sorry!')
+
     return str(resp)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)  # Run Flask app in debug mode for easier debugging
