@@ -1,10 +1,10 @@
 from flask import Flask, request
 import requests
 from twilio.twiml.messaging_response import MessagingResponse
-from flask_lt import run_with_lt  # Import run_with_lt from flask_localtunnel
+
 
 app = Flask(__name__)
-run_with_lt(app)  # Integrate localtunnel with your Flask app
+
 
 @app.route('/bot', methods=['POST'])
 def bot():
