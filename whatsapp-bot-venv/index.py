@@ -8,10 +8,11 @@ app = Flask(__name__)
 
 @app.route('/bot', methods=['POST'])
 def bot():
-    incoming_msg = request.values.get('Body', '').lower()
+    incoming_msg = request.data.get('Body', '').lower()
     resp = MessagingResponse()
     msg = resp.message()
     responded = False
+
     if 'quote' in incoming_msg:
         # return a quote
         r = requests.get('https://api.quotable.io/random')
@@ -22,12 +23,29 @@ def bot():
             quote = 'I could not retrieve a quote at this time, sorry.'
         msg.body(quote)
         responded = True
-    if 'cat' in incoming_msg:
+
+    elif 'cat' in incoming_msg:
         # return a cat pic
         msg.media('https://cataas.com/cat')
         responded = True
+
+    elif 'language' in incoming_msg:
+        # send interactive message for language preference
+        msg.body("Please choose your language preference:")
+        msg.add_button('Hindi', 'HINDI')
+        msg.add_button('English', 'ENGLISH')
+        responded = True
+
+    elif 'hindi' in incoming_msg:
+        msg.body("You have selected Hindi.")
+        responded = True
+
+    elif 'english' in incoming_msg:
+        msg.body("You have selected English.")
+        responded = True
+
     if not responded:
-        msg.body('I only know about famous quotes and cats, sorry!')
+        msg.body('I only know about famous quotes, cats, and language preferences, sorry!')
     return str(resp)
 
 if __name__ == '__main__':
